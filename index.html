@@ -74,17 +74,62 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .stack i{background:var(--c);font:700 10px/20px "Noto Sans KR",sans-serif;text-align:center;color:var(--ink);transition:width .25s;overflow:hidden;font-style:normal}
 .pre{display:flex;gap:6px;margin-top:8px;align-items:center}.sum{font-size:11.5px;color:var(--mut);margin:0 0 0 auto;text-align:right}
 [hidden]{display:none!important}
+#main{flex:1;min-height:0;display:flex;flex-direction:column}
+.sub,#guide,#strip{display:none}
+#guide section{background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+#guide h2{font:900 15px "Noto Serif KR",serif;margin:0 0 10px}
+.lg{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:6px;font-size:11.5px;line-height:1.4}
+.lg li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+.lg .sw{width:22px;height:22px;border-radius:5px;border:2px solid var(--wall);background:var(--c)}.lg b{display:block;font-size:12.5px}.lg span{color:var(--mut)}
+.rule{font-size:12px;line-height:1.65;margin:0}.rule b{color:var(--ac)}
+.fnd{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fnd li{display:grid;grid-template-columns:92px 1fr;gap:10px;align-items:center;font-size:12px;line-height:1.45}
+.fnd strong{font:900 16px/1.1 "Noto Serif KR",serif;color:var(--ac);white-space:nowrap}.fnd b{display:block}
+.read{margin:12px 0 0;padding-top:11px;border-top:1px dashed var(--edge);font-size:12.5px;line-height:1.65}
+.top3{list-style:none;margin:10px 0 0;padding:10px 0 0;border-top:1px dashed var(--edge);display:grid;gap:6px}.top3 li{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;font-size:12px}.top3 b{font:700 12px "Noto Serif KR",serif}.top3::before{content:"내 지출 TOP 3";font:700 11px "Noto Sans KR",sans-serif;color:var(--mut)}
+.vd strong{display:block;font:900 20px "Noto Serif KR",serif;color:var(--ac)}.vd span{font-size:12px;color:var(--mut)}
+#strip h4{margin:0 0 8px;font:700 13px "Noto Serif KR",serif;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.lgd{display:flex;gap:10px;font:400 11px "Noto Sans KR",sans-serif;color:var(--mut)}.lgd span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--c);border:1px solid var(--wall);margin-right:4px}
+.srow{display:grid;grid-template-columns:100px 1fr 62px;gap:10px;align-items:center;margin:6px 0;font-size:12px}
+.sb{display:flex;height:22px;border-radius:6px;overflow:hidden;border:1px solid var(--edge)}
+.sb i{background:var(--c);font:700 11px/22px "Noto Sans KR",sans-serif;text-align:center;font-style:normal;overflow:hidden;white-space:nowrap}
+.srow b{text-align:right;font:700 12px "Noto Serif KR",serif}.srow.me span{color:var(--ac);font-weight:700}
 @media (min-width:860px){
-.top{padding:14px 24px 0}.scrub{max-width:720px;width:calc(100% - 48px);margin:10px auto 0}
-#plans{padding:0 20px;gap:24px}
-body[data-m=u] #stage{flex-direction:row}
-body[data-m=u] #panel{width:400px;max-height:none;align-self:center;margin:8px 24px 16px 0;padding:20px}
-body[data-m=u] .ctl-r{padding:7px 0}body[data-m=u] .stack{height:26px;margin-top:16px}body[data-m=u] .stack i{line-height:26px;font-size:11px}}
+.top{padding:16px 28px 0}.ttl{order:-1}h1{font-size:26px}.sub{display:block!important;margin:4px 0 0 15px;font-size:12.5px;color:var(--mut)}.seg{flex:0 0 360px}
+.scrub{max-width:720px;width:calc(100% - 56px);margin:10px auto 0}
+#stage{display:grid;grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto 1fr;grid-template-areas:"main panel" "main guide";gap:0 24px;padding:6px 28px 28px;align-items:start;flex:none;overflow:visible}
+html{height:auto}body{height:auto;min-height:100vh;overflow-y:auto}
+#main{grid-area:main;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;min-width:0;height:auto}
+#panel{grid-area:panel;max-height:none;margin:8px 0 0;padding:16px;position:sticky;top:12px;align-self:start}
+#guide{grid-area:guide;display:block;margin-top:14px}
+#plans{flex:0 1 auto;width:100%;justify-content:center;gap:18px;padding:0}
+.pw{flex:0 1 clamp(340px,calc((100vh - 200px)*.712),460px)}
+#plans svg{flex:none;height:auto;aspect-ratio:396/556}
+#strip{display:block;width:100%;max-width:780px;margin-top:14px;background:var(--card);border:1px solid var(--edge);border-radius:16px;padding:12px 16px 8px}
+.chips{flex-wrap:wrap;overflow:visible}.stack{display:none}.tabs small{display:none}.tabs button{padding:6px 4px}
+}
+@media (min-width:1200px){#stage{grid-template-columns:250px minmax(0,1fr) 330px;grid-template-rows:auto;grid-template-areas:"guide main panel"}#guide{margin-top:8px;position:sticky;top:12px;align-self:start}}
+
+#side{display:contents}
+.keys{list-style:none;margin:0;padding:10px 0 0;border-top:1px dashed var(--edge);display:grid;gap:4px;font-size:12px}.keys b{color:var(--ac);margin-right:8px}
+@media (min-width:860px){
+#stage{grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:auto;grid-template-areas:"main side";gap:0 24px}
+#side{display:flex;flex-direction:column;gap:12px;grid-area:side;align-self:start;margin-top:8px}
+#panel,#guide{grid-area:auto;position:static;margin:0}
+#guide{display:flex;flex-direction:column;gap:12px}#guide section{margin-bottom:0}
+#guide .lg{grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:10px}
+}
 </style></head><body data-m="b">
-<header class="top"><div class="seg" role="group" aria-label="보기"><button data-m="b">나란히 비교</button><button data-m="c">슬라이더</button><button data-m="u">직접 입력</button></div><h1>리빙 구조</h1></header>
+<header class="top"><div class="seg" role="group" aria-label="보기"><button data-m="b">나란히 비교</button><button data-m="c">슬라이더</button><button data-m="u">직접 입력</button></div><div class="ttl"><h1>리빙 구조</h1><p class="sub">집 평면도로 읽는 1인 가구의 지출 · 한국 1인 가구 vs 중국인 유학생</p></div></header>
 <div class="scrub" id="scrub" hidden><button data-e="0">한국 1인 가구</button><input type="range" id="tr" min="0" max="1" step="0.001" value="0" aria-label="한국 1인 가구와 중국인 유학생 사이"><button data-e="1">중국인 유학생</button></div>
-<div id="stage"><div id="plans"></div>
-<aside id="panel"><div id="info"></div><div id="ctl" hidden></div></aside></div>
+<div id="stage"><main id="main"><div id="plans"></div><div id="strip"></div></main>
+<div id="side"><aside id="panel"><div id="info"></div><div id="ctl" hidden></div></aside>
+<aside id="guide"><section><h2>읽는 법</h2><ul class="lg">
+<li style="--c:var(--rh)"><i class="sw"></i><div><b>침실 · 주거비</b><span>월세·관리비, 전기·가스, 통신비</span></div></li>
+<li style="--c:var(--rf)"><i class="sw"></i><div><b>주방 · 식비</b><span>식품 구매, 외식, 배달·커피</span></div></li>
+<li style="--c:var(--rs)"><i class="sw"></i><div><b>거실 · 쇼핑/여가</b><span>의류, 생활용품, 여가·문화</span></div></li>
+<li style="--c:var(--rt)"><i class="sw"></i><div><b>현관 · 교통비</b><span>자동차, 버스·지하철, 택시</span></div></li></ul>
+<ul class="keys"><li><b>방 면적</b>지출 비중</li><li><b>가구 크기</b>항목 금액</li><li><b>빗금</b>한국 대비 줄어든 면적</li></ul></section><section id="dyn"></section></aside></div></div>
 <script>
 const f=n=>+n.toFixed(1);
 const R=(x,y,w,h,r=0)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(r)}"/>`;
@@ -179,10 +224,21 @@ o+=`<rect class="wall" x="${f(g.x0)}" y="${f(g.y0)}" width="${f(g.W)}" height="$
 o+=`<path d="M${f(ex-34)} 504l-5 8h10z" fill="var(--ink)"/><text x="${f(ex-34)}" y="526" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--ink)">주 출입구</text><circle cx="6" cy="518" r="10" fill="none" stroke="var(--wall)"/><path d="M6 509l4 14-4-3-4 3z" fill="var(--ink)"/><text x="6" y="540" text-anchor="middle" font-size="9" style="fill:var(--mut)">N</text></svg>`;
 return o}
 const cap=(n,g)=>`<div class="cap">${n?n+'<small>':''}월 ${f(g.t)}만원 · 식비 <span>${(g.rooms.f.v/g.t*100).toFixed(1)}%</span>${n?'</small>':''}</div>`;
+const KS=['h','f','s','t'],sh=D=>KS.map(k=>D.r[k]/D.t*100);
+function strip(){const Dk=DS.k,Ds=DS.s,mx=()=>KS.map(k=>L2(Dk.r[k]/Dk.t,Ds.r[k]/Ds.t,T)*100);let rows;
+if(mode==='b')rows=[['한국 1인 가구',sh(Dk),Dk.t,0],['중국인 유학생',sh(Ds),Ds.t,0]];
+else if(mode==='c')rows=[['한국 1인 가구',sh(Dk),Dk.t,0],['지금 보는 집',mx(),L2(Dk.t,Ds.t,T),1],['중국인 유학생',sh(Ds),Ds.t,0]];
+else rows=[['내 지출',sh(DS.u),DS.u.t,1],['한국 1인 가구',sh(Dk),Dk.t,0],['중국인 유학생',sh(Ds),Ds.t,0]];
+$('strip').innerHTML=`<h4>지출 구조 한눈에 · 방 면적 비중<span class="lgd">${KS.map(k=>`<span style="--c:var(--r${k})">${RN[k][0]}·${RN[k][1]}</span>`).join('')}</span></h4>`+rows.map(([n,p,t,me])=>`<div class="srow${me?' me':''}"><span>${n}</span><div class="sb">${p.map((v,i)=>`<i style="width:${v}%;--c:var(--r${KS[i]})">${v>7?Math.round(v)+'%':''}</i>`).join('')}</div><b>${f(t)}만원</b></div>`).join('')}
+function guideDyn(){const Dk=DS.k,Ds=DS.s,pc=(D,k)=>D.r[k]/D.t*100,el=$('dyn');
+if(mode!=='u'){el.innerHTML=`<h2>발견</h2><ul class="fnd"><li><strong>−${Math.round((1-Ds.t/Dk.t)*100)}%</strong><span><b>집이 작아진다</b>총지출 ${f(Ds.t)}만원, 한국 ${f(Dk.t)}만원</span></li><li><strong>${Math.round(pc(Dk,'f'))}→${Math.round(pc(Ds,'f'))}%</strong><span><b>주방이 커진다</b>식비 비중이 집의 절반 가까이</span></li><li><strong>${Math.round(pc(Dk,'s'))}→${Math.round(pc(Ds,'s'))}%</strong><span><b>거실이 줄어든다</b>쇼핑·여가부터 줄인다</span></li><li><strong>${f(I.find(i=>i.id==='car').k)}→0만</strong><span><b>현관의 자동차가 사라진다</b>버스·택시가 대신한다</span></li></ul><p class="read"><b>해석</b> 식비 금액은 ${f(Dk.r.f)}→${f(Ds.r.f)}만원으로 비슷하다. 총액이 작아 비중만 커진다.</p>`;return}
+const u=DS.u,d=D=>KS.reduce((a,k)=>a+Math.abs(pc(u,k)-pc(D,k)),0)/2,dk=d(Dk),ds=d(Ds),nr=dk<ds?Dk:Ds,df=KS.map(k=>[k,pc(u,k)-pc(nr,k)]).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]))[0];
+const top=[...I].sort((a,b)=>b.u-a.u).slice(0,3),same=Math.min(dk,ds)<.5;
+el.innerHTML=`<h2>내 집은 누구에 가까울까</h2><div class="vd"><strong>${nr.n}</strong><span>${same?'지출 구조가 거의 같습니다':`구조 차이 ${Math.min(dk,ds).toFixed(1)}%p (반대쪽 ${Math.max(dk,ds).toFixed(1)}%p)`}</span></div><p class="read">${same?`방 비중이 ${nr.n} 평균과 같습니다.`:`${RN[df[0]][0]}(${RN[df[0]][1]}) 비중이 ${nr.n} 평균보다 ${Math.abs(df[1]).toFixed(1)}%p ${df[1]>0?'큽니다':'작습니다'}.`} 총지출은 ${f(u.t)}만원으로 한국 평균의 ${Math.round(u.t/Dk.t*100)}%입니다.</p><ol class="top3">${top.map(i=>`<li>${ico(i.id,26)}<span>${i.nm}</span><b>${f(i.u)}만</b></li>`).join('')}</ol>`}
 function plan(){rec();let h;
 if(mode==='b')h=`<div class="pw"><div class="cap">${DS.k.n}<small>월 ${f(GK.t)}만원 · 식비 <span>${(GK.rooms.f.v/GK.t*100).toFixed(1)}%</span></small></div>${svg(GK,'a')}</div><div class="pw"><div class="cap">${DS.s.n}<small>월 ${f(GS.t)}만원 · 식비 <span>${(GS.rooms.f.v/GS.t*100).toFixed(1)}%</span></small></div>${svg(GS,'b')}</div>`;
 else{const g=mode==='u'?geom('u'):mix(GK,GS,T);h=`<div class="pw">${cap('',g)}${svg(g,'c')}</div>`}
-$('plans').innerHTML=h}
+$('plans').innerHTML=h;strip();guideDyn()}
 const ico=(id,z)=>{const m=I.find(x=>x.id===id),a=m.ar,w=a>=1?100:100*a,h=a>=1?100/a:100;return `<svg class="ic" viewBox="-6 -6 112 112" width="${z}" height="${z}" aria-hidden="true"><g class="fur" transform="translate(${f((100-w)/2)} ${f((100-h)/2)})">${L[id](w,h)}</g></svg>`};
 let ik='';
 function panel(){document.body.dataset.m=mode;const u=mode==='u';$('ctl').hidden=!u;$('info').hidden=u;$('scrub').hidden=mode!=='c';
