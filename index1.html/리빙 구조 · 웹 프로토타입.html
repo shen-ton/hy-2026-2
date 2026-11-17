@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>리빙 구조 · 웹 프로토타입</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{--po:1;--bg:#E8E5DE;--paper:#EDEAE3;--gap:#EDEAE3;--ink:#2B3440;--mut:#69727E;--wall:#5A423B;--card:rgba(244,242,237,.92);--edge:rgba(65,86,111,.28);--line:rgba(65,86,111,.35);--rh:#DCD4C6;--rf:#AEBCCB;--rs:#D3D0BC;--rt:#DADDE0;--ac:#41566F;--ac2:#968D77;--trk:rgba(65,86,111,.2);--fu:#F9F6EF;--fa:#7E91A5;--fw:#E7D3AE;--fk:#5A423B;--fb:#8C6F5B;--fl:#FFFFFF;--rug:#CFCABE;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--po:.4;--bg:#171D25;--paper:#1D242D;--gap:#1D242D;--ink:#E4E7EA;--mut:#98A3AF;--wall:#CDBBAA;--card:rgba(30,38,48,.92);--edge:rgba(160,180,205,.3);--line:rgba(160,180,205,.35);--rh:#3B3A37;--rf:#33485C;--rs:#383A30;--rt:#2F363D;--ac:#9DB4CC;--ac2:#B3A98E;--trk:rgba(160,180,205,.22);--fu:#4B5662;--fa:#6F88A3;--fw:#76674B;--fk:#CDBBAA;--fb:#A68468;--fl:#7A8794;--rug:#2C3239}}
+:root[data-theme="dark"]{--po:.4;--bg:#171D25;--paper:#1D242D;--gap:#1D242D;--ink:#E4E7EA;--mut:#98A3AF;--wall:#CDBBAA;--card:rgba(30,38,48,.92);--edge:rgba(160,180,205,.3);--line:rgba(160,180,205,.35);--rh:#3B3A37;--rf:#33485C;--rs:#383A30;--rt:#2F363D;--ac:#9DB4CC;--ac2:#B3A98E;--trk:rgba(160,180,205,.22);--fu:#4B5662;--fa:#6F88A3;--fw:#76674B;--fk:#CDBBAA;--fb:#A68468;--fl:#7A8794;--rug:#2C3239}
+*{box-sizing:border-box}
+html{height:100dvh}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{height:100%;display:flex;flex-direction:column;overflow:hidden;font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:var(--po);background:url("%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='700' fill='none' stroke='%237E91A5' stroke-width='1' stroke-opacity='.4'%3E%3Cpath d='M-40 330 C 140 260, 260 360, 420 230 S 700 120, 940 -30'/%3E%3Cpath d='M-40 360 C 140 290, 260 386, 420 256 S 700 142, 940 -10'/%3E%3Cpath d='M-40 390 C 140 320, 260 412, 420 282 S 700 164, 940 10'/%3E%3Cpath d='M-40 420 C 140 350, 260 438, 420 308 S 700 186, 940 30'/%3E%3Cpath d='M-40 450 C 140 380, 260 464, 420 334 S 700 208, 940 50'/%3E%3Cpath d='M-40 480 C 140 410, 260 490, 420 360 S 700 230, 940 70'/%3E%3Cpath d='M-40 510 C 140 440, 260 516, 420 386 S 700 252, 940 90'/%3E%3Cpath d='M-40 540 C 140 470, 260 542, 420 412 S 700 274, 940 110'/%3E%3Cpath d='M-40 570 C 140 500, 260 568, 420 438 S 700 296, 940 130'/%3E%3Cpath d='M-40 600 C 140 530, 260 594, 420 464 S 700 318, 940 150'/%3E%3C/svg%3E") 0 0/880px no-repeat,url("%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .3 0 0 0 0 .25 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"),radial-gradient(90% 55% at 0% 0%,rgba(138,160,184,.42),transparent 72%),radial-gradient(80% 45% at 100% 100%,rgba(150,141,119,.26),transparent 70%)}
+.top,.scrub,#stage{position:relative;z-index:1}
+.top{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 0}
+h1{font-family:"Noto Serif KR",serif;font-weight:900;font-size:19px;margin:0;letter-spacing:-.02em;white-space:nowrap;padding-left:11px;border-left:4px solid var(--wall)}
+.seg{display:flex;gap:2px;padding:3px;background:var(--card);border:1px solid var(--edge);border-radius:999px;flex:0 1 330px}
+.seg button{flex:1;padding:7px 6px;font:500 12.5px "Noto Sans KR",sans-serif;background:none;color:var(--ink);border:0;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .2s}
+.seg button[aria-pressed=true]{background:var(--ac);color:var(--paper);font-weight:700}
+button:focus-visible,input:focus-visible,.fur:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.scrub{flex:none;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin:8px 14px 0;padding:2px 16px;background:var(--card);border:1px solid var(--edge);border-radius:999px}
+.scrub button{font:500 13px "Noto Serif KR",serif;color:var(--mut);background:none;border:0;padding:4px 0;cursor:pointer}.scrub button.on{color:var(--ink);font-weight:900}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;margin:0;background:none}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:linear-gradient(to right,var(--ac) var(--p,0%),var(--trk) var(--p,0%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;margin-top:-7px;border-radius:50%;background:var(--fu);border:2px solid var(--ac);box-shadow:0 1px 3px rgba(0,0,0,.28)}
+input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--trk)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--ac)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--fu);border:2px solid var(--ac)}
+#stage{flex:1;min-height:0;display:flex;flex-direction:column;margin-top:2px}
+#plans{flex:1;min-height:0;display:flex;gap:8px;padding:0 8px;justify-content:center}
+.pw{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center}
+.cap{flex:none;font:700 14px "Noto Serif KR",serif;padding:2px 0 0;text-align:center}.cap small{display:block;font:400 12px "Noto Sans KR",sans-serif;color:var(--mut);margin:1px 0 2px}.cap span{color:var(--ac);font-weight:900}
+#plans svg{flex:1;min-height:0;width:100%;display:block;touch-action:manipulation}
+#plans svg text{font-family:"Noto Sans KR",sans-serif;pointer-events:none;fill:var(--ink)}
+.rm-h .bg{fill:var(--rh)}.rm-f .bg{fill:var(--rf)}.rm-s .bg{fill:var(--rs)}.rm-t .bg{fill:var(--rt)}
+.rm .bg{stroke:var(--wall);stroke-width:3;cursor:pointer}.rm.cur .bg{stroke:var(--ac);stroke-width:4}
+.wall{fill:none;stroke:var(--wall);stroke-width:7;filter:drop-shadow(2px 3px 2px rgba(60,40,30,.22))}
+.dim{stroke:var(--mut);stroke-width:1;fill:none}
+.fur{cursor:pointer;filter:drop-shadow(1px 2px 1.6px rgba(70,50,40,.28))}
+.fur *{fill:var(--fu);stroke:var(--fk);stroke-width:1;stroke-linejoin:round;stroke-linecap:round}
+.fur .n{fill:none}.fur .t{fill:none;stroke-width:.7;stroke-opacity:.6}.fur .a{fill:var(--fa)}.fur .w{fill:var(--fw)}.fur .l{fill:var(--fl)}.fur .d{fill:var(--fk)}.fur .b{fill:var(--fb)}
+.fur:hover *,.fur.sel *{stroke:var(--ac)}.fur .g{fill:var(--rug);stroke:none}
+.selbox{fill:none;stroke:var(--ac);stroke-width:1.3;stroke-dasharray:4 3;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.selbox{animation:dash 1.4s linear infinite}.br i::after{animation:grow .5s ease-out}}
+@keyframes dash{to{stroke-dashoffset:-14}}@keyframes grow{from{transform:scaleX(0)}}
+.rug{fill:var(--rug);stroke:none;pointer-events:none}.rugl{fill:none;stroke:var(--fl);stroke-opacity:.7;stroke-dasharray:3 3;pointer-events:none}
+#panel{flex:none;margin:6px 10px 10px;background:var(--card);border:1px solid var(--edge);border-radius:18px;box-shadow:0 10px 28px -14px rgba(40,55,75,.45);padding:10px 12px 12px;max-height:32vh;overflow:auto;position:relative;z-index:1;backdrop-filter:blur(8px)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chips button{display:flex;align-items:center;gap:6px;font:500 12px "Noto Sans KR",sans-serif;padding:3px 11px 3px 3px;border:1px solid var(--edge);border-radius:999px;background:none;color:var(--ink);cursor:pointer;white-space:nowrap;flex:none}
+.chips button[aria-pressed=true]{background:var(--ac);color:var(--paper);border-color:var(--ac)}
+.cic{width:26px;height:26px;border-radius:50%;background:var(--c);display:grid;place-items:center;flex:none}
+.ic{display:block;overflow:visible}.ic *{vector-effect:non-scaling-stroke}
+.card{display:grid;grid-template-columns:auto 1fr auto;gap:6px 12px;align-items:center}
+.thumb{width:62px;height:62px;border-radius:16px;background:var(--c);display:grid;place-items:center;border:1px solid var(--edge)}
+.card h3{font:700 17px "Noto Serif KR",serif;margin:0}.card h3 small{font:400 12px "Noto Sans KR",sans-serif;color:var(--mut);margin-left:6px}
+.fn{font-size:11.5px;color:var(--mut)}
+.ratio{text-align:right}.ratio b{display:block;font:900 24px/1 "Noto Serif KR",serif;color:var(--ac);white-space:nowrap}.ratio span{font-size:10.5px;color:var(--mut)}
+.cm{grid-column:1/-1;margin:2px 0 0;font-size:12.5px;line-height:1.5;color:var(--mut)}
+.bars{grid-column:1/-1;display:grid;gap:6px}
+.br{display:grid;grid-template-columns:86px 1fr 40px;gap:8px;align-items:center;font-size:11.5px}
+.br i{height:8px;border-radius:8px;background:var(--trk);position:relative;overflow:hidden}
+.br i::after{content:"";position:absolute;inset:0;width:var(--w);background:var(--ac);border-radius:8px;transform-origin:left}
+.br.s i::after{background:var(--ac2)}.br b{text-align:right;font:700 12px "Noto Serif KR",serif}
+.tabs{display:flex;gap:6px;margin-bottom:8px}.tabs button{flex:1}@media (max-width:520px){.tabs small{display:none}.tabs button{padding:6px 4px}}
+.tabs button,.pre button{font:500 12px "Noto Sans KR",sans-serif;padding:6px 12px;border:1px solid var(--edge);border-radius:999px;background:none;color:var(--ink);cursor:pointer;white-space:nowrap;flex:none}
+.tabs button[aria-pressed=true]{background:var(--ac);color:var(--paper);border-color:var(--ac)}
+.tabs .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);border:1px solid var(--wall);margin-right:6px}
+.tabs small{font-size:10.5px;opacity:.7;margin-left:4px}
+.ctl-r{display:grid;grid-template-columns:30px 88px 1fr 38px;gap:8px;align-items:center;font-size:13px;font-weight:500;padding:3px 0}
+.ctl-r small{display:block;color:var(--mut);font-size:10.5px;font-weight:400}
+.ctl-r output{text-align:right;font:700 13px "Noto Serif KR",serif}
+.stack{display:flex;height:20px;border-radius:10px;overflow:hidden;margin:10px 0 2px;border:1px solid var(--edge)}
+.stack i{background:var(--c);font:700 10px/20px "Noto Sans KR",sans-serif;text-align:center;color:var(--ink);transition:width .25s;overflow:hidden;font-style:normal}
+.pre{display:flex;gap:6px;margin-top:8px;align-items:center}.sum{font-size:11.5px;color:var(--mut);margin:0 0 0 auto;text-align:right}
+[hidden]{display:none!important}
+@media (min-width:860px){
+.top{padding:14px 24px 0}.scrub{max-width:720px;width:calc(100% - 48px);margin:10px auto 0}
+#plans{padding:0 20px;gap:24px}
+body[data-m=u] #stage{flex-direction:row}
+body[data-m=u] #panel{width:400px;max-height:none;align-self:center;margin:8px 24px 16px 0;padding:20px}
+body[data-m=u] .ctl-r{padding:7px 0}body[data-m=u] .stack{height:26px;margin-top:16px}body[data-m=u] .stack i{line-height:26px;font-size:11px}}
+</style></head><body data-m="b">
+<header class="top"><div class="seg" role="group" aria-label="보기"><button data-m="b">나란히 비교</button><button data-m="c">슬라이더</button><button data-m="u">직접 입력</button></div><h1>리빙 구조</h1></header>
+<div class="scrub" id="scrub" hidden><button data-e="0">한국 1인 가구</button><input type="range" id="tr" min="0" max="1" step="0.001" value="0" aria-label="한국 1인 가구와 중국인 유학생 사이"><button data-e="1">중국인 유학생</button></div>
+<div id="stage"><div id="plans"></div>
+<aside id="panel"><div id="info"></div><div id="ctl" hidden></div></aside></div>
+<script>
+const f=n=>+n.toFixed(1);
+const R=(x,y,w,h,r=0)=>`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(r)}"/>`;
+const C=(x,y,r)=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}"/>`;
+const P=d=>`<path d="${d}"/>`;
+const K=(c,x)=>x.replace(/\/>/g,` class="${c}"/>`);
+const chair=(x,y,a,z)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${a})">${R(-z/2,-z*.4,z,z*.8,z*.22)+K('t',R(-z*.34,-z*.22,z*.68,z*.5,z*.16))+K('n',P(`M${f(-z/2)} ${f(-z*.5)}Q0 ${f(-z*.64)} ${f(z/2)} ${f(-z*.5)}`))}</g>`;
+const carD=(w,h,t)=>K('d',R(-w*.03,h*.14,w*.09,h*.16,2)+R(w*.94,h*.14,w*.09,h*.16,2)+R(-w*.03,h*.7,w*.09,h*.16,2)+R(w*.94,h*.7,w*.09,h*.16,2))+R(w*.05,0,w*.9,h,w*.28)+K('t',P(`M${f(w*.12)} ${f(h*.22)}Q${f(w*.5)} ${f(h*.17)} ${f(w*.88)} ${f(h*.22)}`))+K('a',P(`M${f(w*.17)} ${f(h*.3)}H${f(w*.83)}L${f(w*.77)} ${f(h*.44)}H${f(w*.23)}Z`)+P(`M${f(w*.23)} ${f(h*.66)}H${f(w*.77)}L${f(w*.83)} ${f(h*.78)}H${f(w*.17)}Z`))+R(w*.2,h*.44,w*.6,h*.22,3)+K('l',R(w*.12,h*.02,w*.2,h*.035,2)+R(w*.68,h*.02,w*.2,h*.035,2))+R(-w*.03,h*.34,w*.1,h*.06,2)+R(w*.93,h*.34,w*.1,h*.06,2)+(t?K('l',R(w*.34,h*.52,w*.32,h*.07,2)):'');
+const L={
+bed:(w,h)=>K('g',R(-6,h*.4,w+12,h*.66,6))+R(0,0,w,h,4)+K('w',R(0,0,w,h*.07,3))+[.1,.52].map(a=>R(w*a,h*.09,w*.38,h*.17,w*.07)+K('t',P(`M${f(w*(a+.06))} ${f(h*.175)}H${f(w*(a+.32))}`))).join('')+K('a',R(w*.03,h*.3,w*.94,h*.67,5))+K('l',R(w*.03,h*.3,w*.94,h*.11,3))+K('t',P(`M${f(w*.1)} ${f(h*.58)}H${f(w*.9)}M${f(w*.1)} ${f(h*.68)}H${f(w*.9)}`))+K('l',R(w*.03,h*.8,w*.94,h*.13,3)),
+heat:(w,h)=>R(0,0,w,h,3)+K('t',R(w*.05,h*.15,w*.9,h*.7,2))+Array.from({length:6},(_,i)=>K('t',R(w*.1+i*w*.8/6,h*.24,w*.8/6*.62,h*.52,w*.03))).join('')+K('a',C(w*.93,h*.9,Math.min(w,h)*.06)),
+wifi:(w,h)=>K('n',P(`M${f(w*.22)} ${f(h*.5)}L${f(w*.1)} ${f(h*.04)}M${f(w*.78)} ${f(h*.5)}L${f(w*.9)} ${f(h*.04)}M${f(w*.36)} ${f(h*.32)}Q${f(w*.5)} ${f(h*.1)} ${f(w*.64)} ${f(h*.32)}`))+K('d',C(w*.1,h*.04,Math.min(w,h)*.05)+C(w*.9,h*.04,Math.min(w,h)*.05))+R(0,h*.46,w,h*.54,3)+K('a',C(w*.2,h*.73,Math.min(w,h)*.045)+C(w*.3,h*.73,Math.min(w,h)*.045))+K('t',P(`M${f(w*.52)} ${f(h*.73)}H${f(w*.9)}`)),
+fridge:(w,h)=>R(0,0,w,h,3)+K('t',R(w*.06,h*.05,w*.88,h*.9,2))+K('n',P(`M${f(w*.06)} ${f(h*.34)}H${f(w*.94)}`))+K('l',R(w*.76,h*.08,w*.06,h*.2,w*.03)+R(w*.76,h*.42,w*.06,h*.3,w*.03)),
+table:(w,h)=>{const r=Math.min(w,h),c=r/2,z=r*.22,d=r*.36;return chair(c,c-d,0,z)+chair(c+d,c,90,z)+chair(c,c+d,180,z)+chair(c-d,c,270,z)+C(c,c,r*.27)+K('t',C(c,c,r*.21))+K('a',C(c,c,r*.07))},
+cafe:(w,h)=>{const r=Math.min(w,h),c=r/2;return K('t',C(c,c,r*.5))+R(c*.96+r*.3,c-r*.08,r*.17,r*.16,r*.07)+C(c*.96,c,r*.34)+K('b',C(c*.96,c,r*.26))+K('t',C(c*.96,c,r*.15))+K('n',P(`M${f(c*.3)} ${f(c*1.5)}L${f(c*.7)} ${f(c*1.24)}`))},
+sofa:(w,h)=>R(0,0,w,h,h*.16)+R(0,0,w,h*.3,h*.14)+R(0,h*.18,w*.1,h*.82,h*.1)+R(w*.9,h*.18,w*.1,h*.82,h*.1)+[0,1,2].map(i=>R(w*.1+i*w*.8/3,h*.32,w*.8/3,h*.64,h*.08)).join('')+K('a',R(w*.13,h*.37,h*.28,h*.22,4)).replace('<rect','<rect transform="rotate(-14 '+f(w*.13+h*.14)+' '+f(h*.48)+')"')+K('a',R(w*.87-h*.28,h*.37,h*.28,h*.22,4)).replace('<rect','<rect transform="rotate(14 '+f(w*.87-h*.14)+' '+f(h*.48)+')"'),
+ward:(w,h)=>K('w',R(0,0,w,h,2))+K('t',R(w*.04,h*.1,w*.92,h*.8,1.5))+K('n',P(`M${f(w/2)} ${f(h*.1)}V${f(h*.9)}`))+K('d',C(w*.45,h/2,1.6)+C(w*.55,h/2,1.6))+K('t',P(`M${f(w*.1)} ${f(h*.3)}H${f(w*.4)}M${f(w*.6)} ${f(h*.3)}H${f(w*.9)}`)),
+shelf:(w,h)=>{const n=Math.max(2,Math.round(w/h*.9)),cw=w/n;let o=K('w',R(0,0,w,h,2));for(let i=0;i<n;i++){const x=i*cw;o+=K('t',R(x,0,cw,h))+K('t',P(`M${f(x)} 0L${f(x+cw)} ${f(h)}M${f(x+cw)} 0L${f(x)} ${f(h)}`))}return o},
+car:(w,h)=>carD(w,h,0),
+bus:(w,h)=>K('d',[.12,.66].map(a=>R(w*a,-h*.05,w*.15,h*.07,1)+R(w*a,h*.98,w*.15,h*.07,1)).join(''))+R(0,0,w,h,h*.2)+K('t',R(w*.04,h*.12,w*.78,h*.76,3))+[0,1,2].map(i=>K('t',R(w*.1+i*w*.25,h*.28,w*.19,h*.44,2)+P(`M${f(w*.1+i*w*.25+w*.095)} ${f(h*.28)}V${f(h*.72)}`))).join('')+K('a',P(`M${f(w*.84)} ${f(h*.1)}L${f(w*.97)} ${f(h*.22)}V${f(h*.78)}L${f(w*.84)} ${f(h*.9)}Z`)),
+taxi:(w,h)=>`<g transform="translate(${f(w)} 0) rotate(90)">${carD(h,w,1)}</g>`};
+
+const I=[
+{id:'bed',rm:'h',fn:'침대',nm:'월세·관리비',ar:.78,a:[.5,0],k:41,s:22.5,m:'월세·관리비가 클수록 침대가 커지고 침실이 넓어진다.'},
+{id:'heat',rm:'h',fn:'난방기',nm:'전기·가스',ar:1.3,a:[1,1],k:6.2,s:4.5,m:'전기·가스 요금이 클수록 난방기가 커진다.'},
+{id:'wifi',rm:'h',fn:'공유기',nm:'통신비',ar:1.4,a:[0,1],k:4,s:3,m:'통신비가 클수록 공유기가 커진다.'},
+{id:'fridge',rm:'f',fn:'냉장고',nm:'식품 구매',ar:.6,a:[1,0],k:19.6,s:14,m:'식품 구매가 많을수록, 즉 집에서 해 먹을수록 냉장고가 커진다.'},
+{id:'table',rm:'f',fn:'식탁',nm:'외식',ar:1,a:[.45,.85],k:27.6,s:23,m:'외식이 많을수록 식탁이 커진다.'},
+{id:'cafe',rm:'f',fn:'컵',nm:'배달·커피',ar:1,a:[0,0],k:3.3,s:8,m:'배달과 커피 지출이 클수록 컵이 커진다.'},
+{id:'sofa',rm:'s',fn:'소파',nm:'여가·문화',ar:2.1,a:[.5,1],k:14,s:5,m:'여가·문화 지출이 클수록 소파가 커진다.'},
+{id:'ward',rm:'s',fn:'옷장',nm:'의류 구매',ar:1.5,a:[0,.4],k:12.8,s:6,m:'신발·패션을 포함한 의류 구매가 클수록 옷장이 커진다.'},
+{id:'shelf',rm:'s',fn:'수납장',nm:'생활용품',ar:2,a:[.8,0],k:11,s:4,m:'생활용품 지출이 클수록 수납장이 커진다.'},
+{id:'car',rm:'t',fn:'자동차',nm:'자동차',ar:.5,a:[0,.5],k:18.4,s:0,m:'자동차가 있으면 현관 앞에 놓인다. 유학생은 거의 없다.'},
+{id:'bus',rm:'t',fn:'버스',nm:'버스·지하철',ar:2.2,a:[1,0],k:11,s:7,m:'버스·지하철 지출이 클수록 버스가 커진다.'},
+{id:'taxi',rm:'t',fn:'택시',nm:'택시',ar:1,a:[1,.5],k:0,s:3,m:'택시 지출이 클수록 택시가 커진다.'}];
+const DS={k:{n:'한국 1인 가구',t:168.9,r:{h:51.2,f:50.5,s:37.8,t:29.4}},s:{n:'중국인 유학생',t:100,r:{h:30,f:45,s:15,t:10}},u:{n:'내 지출',t:1,r:{h:0,f:0,s:0,t:0}}};
+I.forEach(i=>i.u=i.s);
+const RN={h:['침실','주거비'],f:['주방','식비'],s:['거실','쇼핑/여가'],t:['현관','교통비']},NUM={h:1,f:2,s:3,t:4};
+const A=240,LB=20;
+function rec(){const r={h:0,f:0,s:0,t:0};I.forEach(i=>r[i.rm]+=i.u);DS.u.r=r;DS.u.t=Math.max(1,r.h+r.f+r.s+r.t)}
+function sq(its,x,y,w,h){its=[...its].sort((a,b)=>b[1]-a[1]);const sc=w*h/its.reduce((a,b)=>a+b[1],0),ar=its.map(([k,v])=>[k,v*sc]),out=[];let row=[],i=0;
+const sum=r=>r.reduce((a,b)=>a+b[1],0),worst=(r,s)=>{const t=sum(r);return Math.max(...r.map(b=>Math.max(s*s*b[1]/(t*t),t*t/(s*s*b[1]))))};
+const place=r=>{const t=sum(r);if(w>=h){const cw=t/h;let yy=y;r.forEach(([k,a])=>{out.push([k,x,yy,cw,a/cw]);yy+=a/cw});x+=cw;w-=cw}else{const rh=t/w;let xx=x;r.forEach(([k,a])=>{out.push([k,xx,y,a/rh,rh]);xx+=a/rh});y+=rh;h-=rh}};
+while(i<ar.length){const s=Math.min(w,h),c=[...row,ar[i]];if(!row.length||worst(c,s)<=worst(row,s)){row=c;i++}else{place(row);row=[]}}
+if(row.length)place(row);return out}
+
+const ov=(a,b,g)=>a.x<b.x+b.w+g&&b.x<a.x+a.w+g&&a.y<b.y+b.h+LB+g&&b.y<a.y+a.h+LB+g;
+function put(its,W,H,room){const door=room==='t'?{x:W-56,y:H-56,w:56,h:56-LB}:null;let ps;
+for(let k=1;k>.28;k*=.94){ps=its.map(i=>{const w=i.w*k,h=i.h*k;return{it:i,w,h,x:i.a[0]*(W-w),y:i.a[1]*(H-h-LB)}});
+let ok=ps.every(p=>p.w<=W&&p.h+LB<=H&&!(door&&ov(p,door,0)));
+for(let a=0;ok&&a<ps.length;a++)for(let b=a+1;b<ps.length;b++)if(ov(ps[a],ps[b],4))ok=false;
+if(ok)return ps}return ps||[]}
+const $=id=>document.getElementById(id),L2=(p,q,t)=>p+(q-p)*t;
+function geom(key){const D=DS[key],s=Math.min(1,Math.sqrt(D.t/168.9)),FW=344,FH=484,ox=8,oy=8,W=FW*s,H=FH*s,x0=ox+FW-W,y0=oy+FH-H,rooms={},items={};
+for(const [k,x,y,w,h] of sq(Object.entries(D.r).map(([a,b])=>[a,Math.max(b,.8)]),x0,y0,W,H)){rooms[k]={x,y,w,h,v:D.r[k]};
+const its=I.filter(i=>i[key]>0&&i.rm===k).map(i=>{const a=i[key]*A;return{...i,v:i[key],w:Math.sqrt(a*i.ar),h:Math.sqrt(a/i.ar)}}),CW=w-12,CH=h-42,ps=put(its,CW,CH,k);
+for(const p of ps)items[p.it.id]={x:x+6+p.x,y:y+36+p.y,w:p.w,h:p.h,v:p.it.v,rm:k};
+if(0){const z=15,dz=k==='t'?{x:CW-56,y:CH-56,w:56,h:56-LB}:null;
+for(const [cx,cy] of[[CW-z,0],[0,CH-z],[CW-z,CH-z]]){const q={x:cx,y:cy,w:z,h:z-LB};if(ps.every(p=>!ov(q,p,3))&&!(dz&&ov(q,dz,0))){items['pl-'+k]={x:x+6+cx,y:y+36+cy,w:z,h:z,v:0,rm:k,deco:1};break}}}}
+return{t:D.t,W,H,x0,y0,rooms,items}}
+function mix(a,b,t){const o={t:L2(a.t,b.t,t),W:L2(a.W,b.W,t),H:L2(a.H,b.H,t),x0:L2(a.x0,b.x0,t),y0:L2(a.y0,b.y0,t),rooms:{},items:{}};
+for(const k in a.rooms){const p=a.rooms[k],q=b.rooms[k];o.rooms[k]={x:L2(p.x,q.x,t),y:L2(p.y,q.y,t),w:L2(p.w,q.w,t),h:L2(p.h,q.h,t),v:L2(p.v,q.v,t)}}
+for(const id of new Set([...Object.keys(a.items),...Object.keys(b.items)])){const p=a.items[id],q=b.items[id],z=r=>({...r,w:0,h:0,v:0,x:r.x+r.w/2,y:r.y+r.h/2}),pp=p||z(q),qq=q||z(p);
+o.items[id]={x:L2(pp.x,qq.x,t),y:L2(pp.y,qq.y,t),w:L2(pp.w,qq.w,t),h:L2(pp.h,qq.h,t),v:L2(pp.v,qq.v,t),rm:(p||q).rm,deco:(p||q).deco}}
+return o}
+const GK=geom('k'),GS=geom('s');
+let sel='fridge',mode='b',tab='f',T=0;
+const PAT={h:'pw',f:'pt',s:'pl',t:'pe'};
+const win=(x,y,v)=>v?`<rect x="${f(x-3.5)}" y="${f(y-26)}" width="7" height="52" fill="var(--gap)"/><line x1="${f(x-2.5)}" y1="${f(y-26)}" x2="${f(x-2.5)}" y2="${f(y+26)}" stroke="var(--wall)"/><line x1="${f(x+2.5)}" y1="${f(y-26)}" x2="${f(x+2.5)}" y2="${f(y+26)}" stroke="var(--wall)"/>`:`<rect x="${f(x-26)}" y="${f(y-3.5)}" width="52" height="7" fill="var(--gap)"/><line x1="${f(x-26)}" y1="${f(y-2.5)}" x2="${f(x+26)}" y2="${f(y-2.5)}" stroke="var(--wall)"/><line x1="${f(x-26)}" y1="${f(y+2.5)}" x2="${f(x+26)}" y2="${f(y+2.5)}" stroke="var(--wall)"/>`;
+function door(e,c,vert){const S='stroke="var(--wall)"';return vert?`<rect x="${f(e-3)}" y="${f(c-14)}" width="6" height="28" fill="var(--gap)"/><path d="M${f(e)} ${f(c-14)}A28 28 0 0 0 ${f(e-28)} ${f(c+14)}" fill="none" ${S} stroke-opacity=".6" stroke-dasharray="2 2"/><line x1="${f(e)}" y1="${f(c+14)}" x2="${f(e-28)}" y2="${f(c+14)}" ${S} stroke-width="2"/>`:`<rect x="${f(c-14)}" y="${f(e-3)}" width="28" height="6" fill="var(--gap)"/><path d="M${f(c-14)} ${f(e)}A28 28 0 0 1 ${f(c+14)} ${f(e-28)}" fill="none" ${S} stroke-opacity=".6" stroke-dasharray="2 2"/><line x1="${f(c+14)}" y1="${f(e)}" x2="${f(c+14)}" y2="${f(e-28)}" ${S} stroke-width="2"/>`}
+function svg(g,uid){
+let o=`<svg viewBox="-22 -14 396 556" role="img" aria-label="평면도"><defs><pattern id="gh${uid}" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--line)" stroke-width="1.2"/></pattern><pattern id="pw" width="100" height="9" patternUnits="userSpaceOnUse"><line x1="0" y1="8.5" x2="100" y2="8.5" stroke="var(--wall)" stroke-opacity=".1"/></pattern><pattern id="pt" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="#fff" stroke-opacity=".45"/></pattern><pattern id="pl" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="1" fill="var(--ink)" fill-opacity=".14"/></pattern><pattern id="pe" width="18" height="18" patternUnits="userSpaceOnUse"><path d="M18 0H0V18" fill="none" stroke="var(--wall)" stroke-opacity=".12"/></pattern></defs><rect x="8" y="8" width="344" height="484" fill="url(#gh${uid})" stroke="var(--line)"/>`;
+const cut=Math.round((1-g.t/168.9)*100);if(cut>0)o+=`<text x="342" y="42" text-anchor="end" font-size="28" font-weight="900" style="font-family:'Noto Serif KR',serif;fill:var(--ac)">−${cut}%</text>`;
+const ks=Object.keys(g.rooms);
+for(const k of ks){const r=g.rooms[k],pct=r.v/g.t*100,big=r.w>160;
+o+=`<g class="rm rm-${k}${mode==='u'&&tab===k?' cur':''}" data-rm="${k}"><rect class="bg" x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.h)}"/><rect x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.h)}" fill="url(#${PAT[k]})" style="pointer-events:none"/><circle cx="${f(r.x+14)}" cy="${f(r.y+13)}" r="7.5" fill="none" stroke="var(--ink)" stroke-width="1.1"/><text x="${f(r.x+14)}" y="${f(r.y+16.5)}" text-anchor="middle" font-size="9.5" font-weight="700">${NUM[k]}</text><text x="${f(r.x+26)}" y="${f(r.y+17)}" font-size="12.5" font-weight="700">${RN[k][0]}</text><text x="${f(r.x+r.w-8)}" y="${f(r.y+(big?26:20))}" text-anchor="end" font-size="${big?22:16}" font-weight="700" style="font-family:'Noto Serif KR',serif">${pct.toFixed(1)}%</text>`;
+for(const id in g.items){const i=g.items[id];if(i.rm!==k||i.w<5)continue;
+if(i.deco){const c=i.w/2;o+=`<g class="plant" transform="translate(${f(i.x+c)} ${f(i.y+c)})"><circle cx="0" cy="-${f(c*.55)}" r="${f(c*.5)}"/><circle cx="${f(c*.52)}" cy="${f(c*.3)}" r="${f(c*.5)}"/><circle cx="-${f(c*.52)}" cy="${f(c*.3)}" r="${f(c*.5)}"/><circle r="${f(c*.28)}"/></g>`;continue}
+const m=I.find(x=>x.id===id);
+o+=`<g transform="translate(${f(i.x)} ${f(i.y)})">${id==='sofa'?`<rect class="rug" x="-10" y="-12" width="${f(i.w+20)}" height="${f(i.h+24)}" rx="8"/><rect class="rugl" x="-6" y="-8" width="${f(i.w+12)}" height="${f(i.h+16)}" rx="5"/>`:''}${id===sel?`<rect class="selbox" x="-5" y="-5" width="${f(i.w+10)}" height="${f(i.h+10)}" rx="6"/>`:''}<g class="fur${id===sel?' sel':''}" data-id="${id}" tabindex="0" role="button" aria-label="${m.nm} ${f(i.v)}만원">${L[id](i.w,i.h)}</g>${i.w>=30?`<text x="${f(i.w/2)}" y="${f(i.h+9)}" text-anchor="middle" font-size="8.5" font-weight="700">${m.nm}</text><text x="${f(i.w/2)}" y="${f(i.h+18)}" text-anchor="middle" font-size="8.5">${f(i.v)}</text>`:`<text x="${f(i.w/2)}" y="${f(i.h+10)}" text-anchor="middle" font-size="8.5" font-weight="700">${f(i.v)}</text>`}</g>`}
+o+='</g>'}
+const cells=ks.map(k=>[k,g.rooms[k]]),ex=g.x0+g.W,ey=g.y0+g.H,Lc=cells.filter(c=>Math.abs(c[1].x-g.x0)<3).sort((a,b)=>b[1].h-a[1].h)[0][1];
+for(const [k,r] of cells)if(Math.abs(r.y-g.y0)<3&&r.w>100)o+=win(r.x+r.w/2,g.y0,0);
+o+=win(g.x0,Lc.y+Lc.h/2,1);
+const pr=[];for(let a=0;a<ks.length;a++)for(let b=a+1;b<ks.length;b++){const p=g.rooms[ks[a]],q=g.rooms[ks[b]];
+if(Math.abs(p.x+p.w-q.x)<2||Math.abs(q.x+q.w-p.x)<2){const e=Math.abs(p.x+p.w-q.x)<2?q.x:p.x,l=Math.min(p.y+p.h,q.y+q.h)-Math.max(p.y,q.y);if(l>70)pr.push([l,e,Math.max(p.y,q.y)+l/2,1])}
+else if(Math.abs(p.y+p.h-q.y)<2||Math.abs(q.y+q.h-p.y)<2){const e=Math.abs(p.y+p.h-q.y)<2?q.y:p.y,l=Math.min(p.x+p.w,q.x+q.w)-Math.max(p.x,q.x);if(l>70)pr.push([l,e,Math.max(p.x,q.x)+l/2,0])}}
+pr.sort((u,v)=>v[0]-u[0]).slice(0,3).forEach(d=>{o+=door(d[1],d[2],d[3])});
+const dy=g.y0-9,dx=g.x0-9;
+o+=`<g class="dim"><path d="M${f(g.x0)} ${f(dy)}H${f(ex)}M${f(g.x0)} ${f(dy-5)}V${f(dy+5)}M${f(ex)} ${f(dy-5)}V${f(dy+5)}"/><path d="M${f(dx)} ${f(g.y0)}V${f(ey)}M${f(dx-5)} ${f(g.y0)}H${f(dx+5)}M${f(dx-5)} ${f(ey)}H${f(dx+5)}"/></g><rect x="${f((g.x0+ex)/2-38)}" y="${f(dy-7)}" width="76" height="14" fill="var(--gap)"/><text x="${f((g.x0+ex)/2)}" y="${f(dy+3.5)}" text-anchor="middle" font-size="10" style="fill:var(--mut)">월 ${f(g.t)}만원</text>`;
+o+=`<rect class="wall" x="${f(g.x0)}" y="${f(g.y0)}" width="${f(g.W)}" height="${f(g.H)}"/><rect x="${f(ex-54)}" y="${f(ey-4)}" width="38" height="8" fill="var(--gap)"/><path d="M${f(ex-52)} ${f(ey)}A36 36 0 0 1 ${f(ex-16)} ${f(ey-36)}" fill="none" stroke="var(--wall)" stroke-opacity=".6" stroke-dasharray="2 2"/><line x1="${f(ex-16)}" y1="${f(ey)}" x2="${f(ex-16)}" y2="${f(ey-36)}" stroke="var(--wall)" stroke-width="2.6"/>`;
+o+=`<path d="M${f(ex-34)} 504l-5 8h10z" fill="var(--ink)"/><text x="${f(ex-34)}" y="526" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--ink)">주 출입구</text><circle cx="6" cy="518" r="10" fill="none" stroke="var(--wall)"/><path d="M6 509l4 14-4-3-4 3z" fill="var(--ink)"/><text x="6" y="540" text-anchor="middle" font-size="9" style="fill:var(--mut)">N</text></svg>`;
+return o}
+const cap=(n,g)=>`<div class="cap">${n?n+'<small>':''}월 ${f(g.t)}만원 · 식비 <span>${(g.rooms.f.v/g.t*100).toFixed(1)}%</span>${n?'</small>':''}</div>`;
+function plan(){rec();let h;
+if(mode==='b')h=`<div class="pw"><div class="cap">${DS.k.n}<small>월 ${f(GK.t)}만원 · 식비 <span>${(GK.rooms.f.v/GK.t*100).toFixed(1)}%</span></small></div>${svg(GK,'a')}</div><div class="pw"><div class="cap">${DS.s.n}<small>월 ${f(GS.t)}만원 · 식비 <span>${(GS.rooms.f.v/GS.t*100).toFixed(1)}%</span></small></div>${svg(GS,'b')}</div>`;
+else{const g=mode==='u'?geom('u'):mix(GK,GS,T);h=`<div class="pw">${cap('',g)}${svg(g,'c')}</div>`}
+$('plans').innerHTML=h}
+const ico=(id,z)=>{const m=I.find(x=>x.id===id),a=m.ar,w=a>=1?100:100*a,h=a>=1?100/a:100;return `<svg class="ic" viewBox="-6 -6 112 112" width="${z}" height="${z}" aria-hidden="true"><g class="fur" transform="translate(${f((100-w)/2)} ${f((100-h)/2)})">${L[id](w,h)}</g></svg>`};
+let ik='';
+function panel(){document.body.dataset.m=mode;const u=mode==='u';$('ctl').hidden=!u;$('info').hidden=u;$('scrub').hidden=mode!=='c';
+document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode));
+if(u){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===tab));
+document.querySelectorAll('.ctl-r').forEach(r=>{r.hidden=r.dataset.rm!==tab;const i=I.find(x=>x.id===r.dataset.i),n=r.querySelector('input');if(document.activeElement!==n)n.value=i.u;n.style.setProperty('--p',i.u/50*100+'%');r.querySelector('output').textContent=f(i.u);r.querySelector('small').textContent=`전체의 ${(i.u/DS.u.t*100).toFixed(1)}%`});
+[...$('stack').children].forEach(c=>{const p=DS.u.r[c.dataset.k]/DS.u.t*100;c.style.width=p+'%';c.textContent=p>9?Math.round(p)+'%':''});
+$('sum').textContent=`합계 ${f(DS.u.t)}만원 · 식비 ${(DS.u.r.f/DS.u.t*100).toFixed(1)}%`}
+else if(ik!==sel+mode){ik=sel+mode;const i=I.find(x=>x.id===sel),kv=i.k,sv=i.s,mx=Math.max(kv,sv,1),r=kv>0?Math.round(sv/kv*100)+'%':(sv>0?'유학생만':'—'),vv=v=>v?v+'만':'—',ww=v=>Math.max(v/mx*100,v?3:0);
+$('info').innerHTML=`<div class="chips">${I.map(x=>`<button data-id="${x.id}" aria-pressed="${x.id===sel}" style="--c:var(--r${x.rm})"><span class="cic">${ico(x.id,20)}</span>${x.nm}</button>`).join('')}</div><div class="card" style="--c:var(--r${i.rm})"><div class="thumb">${ico(i.id,46)}</div><div><h3>${i.nm}<small>${RN[i.rm][0]}</small></h3><span class="fn">${i.fn}</span></div><div class="ratio"><b>${r}</b><span>한국 대비</span></div><p class="cm">${i.m}</p><div class="bars"><div class="br"><span>한국 1인 가구</span><i style="--w:${ww(kv)}%"></i><b>${vv(kv)}</b></div><div class="br s"><span>중국인 유학생</span><i style="--w:${ww(sv)}%"></i><b>${vv(sv)}</b></div></div></div>`;
+const a=$('info').querySelector('.chips [aria-pressed=true]');a&&a.scrollIntoView({inline:'center',block:'nearest'})}
+$('tr').style.setProperty('--p',T*100+'%');
+const e=$('scrub').querySelectorAll('button');e[0].classList.toggle('on',T<.5);e[1].classList.toggle('on',T>=.5)}
+function draw(){plan();panel()}
+function go(to){const from=T,t0=performance.now();if(matchMedia('(prefers-reduced-motion:reduce)').matches){T=to;$('tr').value=T;draw();return}
+const step=n=>{const p=Math.min(1,(n-t0)/550),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;T=from+(to-from)*e;$('tr').value=T;draw();if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+function build(){let o='<div class="tabs">'+['h','f','s','t'].map(k=>`<button data-t="${k}" style="--c:var(--r${k})"><span class="dot"></span>${RN[k][0]}<small>${RN[k][1]}</small></button>`).join('')+'</div>';
+o+=I.map(i=>`<label class="ctl-r" data-rm="${i.rm}" data-i="${i.id}"><span class="cic" style="--c:var(--r${i.rm})">${ico(i.id,22)}</span><span>${i.nm}<small></small></span><input type="range" min="0" max="50" step="0.5" data-u="${i.id}" aria-label="${i.nm} 만원"><output></output></label>`).join('');
+o+=`<div class="stack" id="stack">${['h','f','s','t'].map(k=>`<i data-k="${k}" style="--c:var(--r${k})" title="${RN[k][0]}"></i>`).join('')}</div><div class="pre"><button data-p="k">한국 평균</button><button data-p="s">유학생 평균</button><p class="sum" id="sum"></p></div>`;$('ctl').innerHTML=o}
+document.addEventListener('click',e=>{const q=e.target.closest.bind(e.target),p=q('[data-p]');if(p){I.forEach(i=>i.u=i[p.dataset.p]);draw();return}
+const m=q('.seg [data-m]');if(m){mode=m.dataset.m;draw();return}
+const w=q('[data-e]');if(w){go(+w.dataset.e);return}
+const t=q('[data-t]');if(t){tab=t.dataset.t;draw();return}
+const d=q('[data-id]');if(d){sel=d.dataset.id;tab=I.find(i=>i.id===sel).rm;draw();return}
+const r=q('[data-rm]');if(r&&mode==='u'){tab=r.dataset.rm;draw()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const t=e.target.closest&&e.target.closest('[data-id]');if(t){e.preventDefault();sel=t.dataset.id;tab=I.find(i=>i.id===sel).rm;draw()}}});
+document.addEventListener('input',e=>{if(e.target.id==='tr'){T=+e.target.value;draw();return}const r=e.target.closest('[data-u]');if(r){I.find(i=>i.id===r.dataset.u).u=+r.value;draw()}});
+build();draw();
+</script></body></html>
